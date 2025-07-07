@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    container_name: users_app
+    depends_on:
+      - postgres
+    ports:
+      - "50000:50000"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: backend_rebase
+      DB_USER: users_admin
+      DB_PASSWORD: secret123
+    command: ["python", "-m", "app"]
+    volumes:
+      - .:/app  # optional: for local dev hot reload
+
+  postgres:
+    image: postgres:17.5
+    container_name: postgres_db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: users_admin
+      POSTGRES_PASSWORD: secret123
+      POSTGRES_DB: backend_rebase
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  pgdata:
